@@ -30,6 +30,6 @@ public class LoggerController {
            kafkaTemplate.send("GMALL_EVENT",logJson);
         
         }
-        return "success";
+        return logJson;
     }
 }
