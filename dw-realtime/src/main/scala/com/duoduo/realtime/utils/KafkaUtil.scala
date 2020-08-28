@@ -1,13 +1,17 @@
 package com.duoduo.realtime.utils
 
+import java.io
 import java.util.Properties
 
 import org.apache.kafka.clients.consumer.ConsumerRecord
+import org.apache.kafka.clients.producer.{KafkaProducer, ProducerRecord}
 import org.apache.kafka.common.TopicPartition
 import org.apache.kafka.common.serialization.StringDeserializer
 import org.apache.spark.streaming.StreamingContext
 import org.apache.spark.streaming.dstream.InputDStream
 import org.apache.spark.streaming.kafka010.{ConsumerStrategies, ConsumerStrategy, KafkaUtils, LocationStrategies}
+
+import scala.collection.mutable
 
 /**
  * Author z
@@ -15,8 +19,10 @@ import org.apache.spark.streaming.kafka010.{ConsumerStrategies, ConsumerStrategy
  */
 object KafkaUtil {
   private val properties: Properties = PropertiesUtil.load("config.properties")
-  val broker_list = properties.getProperty("kafka.broker.list")
-  var kafkaParam = collection.mutable.Map(
+  private val broker_list = properties.getProperty("kafka.broker.list")
+  var kafkaProducer: KafkaProducer[String, String] = null
+  
+   var kafkaParam: mutable.Map[String, io.Serializable] = collection.mutable.Map(
     "bootstrap.servers" -> broker_list, //用于初始化链接到集群的地址
     "key.deserializer" -> classOf[StringDeserializer],
     "value.deserializer" -> classOf[StringDeserializer],
@@ -76,6 +82,41 @@ object KafkaUtil {
     )
   }
   
+  /**
+   * 创建producer
+   * @return
+   */
+  private  def createKafkaProducer: KafkaProducer[String, String] ={
+    import scala.collection.JavaConversions._
+    //​ 如何实现幂等性：ack=-1 并且将 Producer 的参数中 enable.idompotence 设置为 true
+    kafkaParam.put("enable.idompotence",(true: java.lang.Boolean))
+    kafkaParam.remove("group.id")
+    kafkaParam.remove("enable.auto.commit")
+    kafkaParam.remove("auto.offset.reset")
+    var producer:KafkaProducer[String,String]=null
+    try
+      producer=new KafkaProducer[String,String](kafkaParam)
+    catch {
+      case e:Exception=>
+        e.printStackTrace()
+    }
+    producer
+  }
+  
+  /**
+   * 向Kafka发送信息
+   * @param topic
+   * @param msg
+   * @return
+   */
+  def send(topic:String,msg:String)={
+    if(kafkaProducer==null) kafkaProducer=createKafkaProducer
+    kafkaProducer.send(new ProducerRecord[String,String](topic,msg))
+  }
+  def send(topic:String,key:String,msg:String)={
+    if(kafkaProducer==null) kafkaProducer=createKafkaProducer
+    kafkaProducer.send(new ProducerRecord[String,String](topic,key,msg))
+  }
   def main(args: Array[String]): Unit = {
 
   }

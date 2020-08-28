@@ -7,12 +7,13 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="dwrealtime" />
+        <module name="dw-realtime" />
         <module name="dw-common" />
-        <module name="dw-logger" />
         <module name="demo" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
+      <module name="dw-logger" target="1.8" />
       <module name="dwcommon" target="1.8" />
     </bytecodeTargetLevel>
   </component>

@@ -15,7 +15,6 @@ import org.apache.spark.streaming.{Seconds, StreamingContext}
 
 import scala.collection.mutable.ListBuffer
 
-
 /**
  * Author z
  * Date 2020-08-27 14:01:13

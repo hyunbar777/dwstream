@@ -1,7 +1,7 @@
 package com.duoduo.realtime.utils
 
 import java.util
-import java.util.Objects
+import java.util.{Objects, Properties}
 
 import io.searchbox.client.config.HttpClientConfig
 import io.searchbox.client.{JestClient, JestClientFactory}
@@ -13,8 +13,9 @@ import io.searchbox.core.{Bulk, BulkResult, Index}
  */
 object ESUtil {
   private var factory: JestClientFactory = null
-  private val ES_HOST = "http://39.98.49.211"
-  private val ES_HTTP_PORT = 9200
+    private val properties: Properties = PropertiesUtil.load("config.properties")
+  private val ES_URL = properties.getProperty("es.url")
+  //private val ES_HTTP_PORT = 9200
   
   /**
    * 获取客户端
@@ -47,7 +48,7 @@ object ESUtil {
   private def build() = {
     factory = new JestClientFactory
     factory.setHttpClientConfig(
-      new HttpClientConfig.Builder(ES_HOST + ":" + ES_HTTP_PORT)
+      new HttpClientConfig.Builder(ES_URL)
         .multiThreaded(true) //允许多线程
         .maxTotalConnection(20) //最大连接数
         .connTimeout(10000) //连接超时时间
