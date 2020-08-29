@@ -20,8 +20,8 @@ object BaseDBCanalAPP {
       .setMaster("local[4]")
       .setAppName("BaseDBCanalAPP")
     val ssc = new StreamingContext(sparkConf, Seconds(5))
-    val topic = "ODS_DB_GMALL_CANAL"
-    val groupId = "ODS_DB_GMALL_CANAL_GROUP"
+    val topic = "DB_GMALL_CANAL"
+    val groupId = "DB_GMALL_CANAL_GROUP"
     
     //2.0 从redis中读取偏移量
     val kafkaOffsetMap: Map[TopicPartition, Long] = OffsetManager.getOffset(topic, groupId)

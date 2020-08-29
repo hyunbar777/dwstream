@@ -11,7 +11,7 @@ import org.apache.spark.streaming.StreamingContext
 import org.apache.spark.streaming.dstream.InputDStream
 import org.apache.spark.streaming.kafka010.{ConsumerStrategies, ConsumerStrategy, KafkaUtils, LocationStrategies}
 
-import scala.collection.mutable
+
 
 /**
  * Author z
@@ -21,8 +21,7 @@ object KafkaUtil {
   private val properties: Properties = PropertiesUtil.load("config.properties")
   private val broker_list = properties.getProperty("kafka.broker.list")
   var kafkaProducer: KafkaProducer[String, String] = null
-  
-   var kafkaParam: mutable.Map[String, io.Serializable] = collection.mutable.Map(
+   var kafkaParam = collection.mutable.Map(
     "bootstrap.servers" -> broker_list, //用于初始化链接到集群的地址
     "key.deserializer" -> classOf[StringDeserializer],
     "value.deserializer" -> classOf[StringDeserializer],
@@ -87,15 +86,15 @@ object KafkaUtil {
    * @return
    */
   private  def createKafkaProducer: KafkaProducer[String, String] ={
-    import scala.collection.JavaConversions._
     //​ 如何实现幂等性：ack=-1 并且将 Producer 的参数中 enable.idompotence 设置为 true
-    kafkaParam.put("enable.idompotence",(true: java.lang.Boolean))
-    kafkaParam.remove("group.id")
-    kafkaParam.remove("enable.auto.commit")
-    kafkaParam.remove("auto.offset.reset")
+    val properties = new Properties
+    properties.put("bootstrap.servers", broker_list)
+    properties.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer")
+    properties.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer")
+    properties.put("enable.idompotence",(true: java.lang.Boolean))
     var producer:KafkaProducer[String,String]=null
     try
-      producer=new KafkaProducer[String,String](kafkaParam)
+      producer=new KafkaProducer[String,String](properties)
     catch {
       case e:Exception=>
         e.printStackTrace()

@@ -20,8 +20,8 @@ object BaseDBMaxwellAPP {
       .setMaster("local[4]")
       .setAppName("BaseDBMaxwellAPP")
     val ssc = new StreamingContext(sparkConf, Seconds(5))
-    val topic = "ODS_DB_GMALL_Maxwell"
-    val groupId = "ODS_DB_GMALL_Maxwell_GROUP"
+    val topic = "DB_GMALL_MAXWELL"
+    val groupId = "ODS_DB_GMALL_MAXWELL_GROUP"
     
     //2.0 从redis中读取偏移量
     val kafkaOffsetMap: Map[TopicPartition, Long] = OffsetManager.getOffset(topic, groupId)
@@ -53,10 +53,10 @@ object BaseDBMaxwellAPP {
           if (!json.getString("type").equals("bootstrap-start") &&
             !json.getString("type").equals("bootstrap-complete")) {
             val table = json.getString("table")
-            val jsonArr = json.getJSONArray("data")
-            val topic = "ODS_Maxwell_" + table.toUpperCase
-            val key = table + "_" + json.getString("id")
-            KafkaUtil.send(topic, key, json.toJSONString)
+            val jsonArr = json.getJSONObject("data")
+            val topic = "ODS_MAXWELL_" + table.toUpperCase
+            val key = table + "_" + jsonArr.getString("id")
+            KafkaUtil.send(topic, key, jsonArr.toJSONString)
           }
         }
       }
