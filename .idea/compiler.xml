@@ -13,6 +13,7 @@
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
+      <module name="dw-logger" target="1.8" />
       <module name="dwcommon" target="1.8" />
     </bytecodeTargetLevel>
   </component>
